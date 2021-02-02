@@ -24,52 +24,82 @@
   <div class="row">
    <div class="col-11 col-lg-6 my-3">
     <h3 class="text-capitalize">flashcards</h3>
-    <button  class="btn text-capitalize my-2 show-btn" id="show-btn">add question</button>
-    <div  class="card card-body my-3 question-card">
+    <button  class="btn text-capitalize my-2 show-btn" id="show-btn" @click="createCard" :disabled="!addQuestionAble">add question</button>
+
+    <!--new card template-->
+
+    <div  class="card card-body my-3 question-card" v-show="isCardAdded">
      <!-- close btn -->
-     <div  class="alert alert-warning" role="alert">
+     <div  class="alert alert-warning" role="alert" v-show="areFieldsEmpty"> 
         Some of the fields are empty!
       </div>
      <a  href="#" class="close-btn mt-0">
-      <i class="fas fa-window-close"></i>
+      <i class="fas fa-window-close" @click="closeCard"></i>
      </a>
      <!-- end of close btn -->
      <div class="feedback alert w-75 text-capitalize">
       customer feedback
      </div>
-     <form   id="question-form">
+     <form @submit.prevent="saveCard" id="question-form">
       <!-- single input -->
       <h5 class="text-capitalize">question</h5>
       <div class="form-group">
-       <textarea class="w-100" id="question-input" rows="3" ></textarea>
+       <textarea class="w-100" id="question-input" rows="3" v-model="questionInput" ></textarea>
       </div>
       <!-- end of single input -->
       <!-- single input -->
       <h5 class="text-capitalize">answer</h5>
       <div class="form-group">
-       <textarea class="w-100" id="answer-input" rows="3" ></textarea>
+       <textarea class="w-100" id="answer-input" rows="3" v-model="answerInput"></textarea>
       </div>
       <!-- end of single input -->
-      <button class="btn submitBtn text-capitalize w-50">save</button>
+      <button class="btn submitBtn text-capitalize w-50" >save</button>
      </form>
     </div>
    </div>
   </div>
 
+    <!--Template for card data-->
   <div class="row px-2" id="questions-list">
    <div class="col-md-4">
-    <!--Template for card data-->
     <div v-for="flashcard in flashCards"  class="card card-body flashcard my-3">
-     <h4 class="text-capitalize">{{ flashcard.question }}</h4>
-     <a  class="text-capitalize my-3 show-answer">show/hide answer</a>
-     <h5 class="answer mb-3">{{ flashcard.answer}}</h5>
-     <div  class="flashcard-btn d-flex justify-content-between">
-      <a  id="edit-flashcard" class=" btn my-1 edit-flashcard text-uppercase" data-id="">edit</a>
-      <a  id="delete-flashcard" class=" btn my-1 delete-flashcard text-uppercase">delete</a>
+      <div class="result-card" v-if="!flashcard.editMode">
+        <h4 class="text-capitalize">{{ flashcard.question }}</h4>
+        <a  class="text-capitalize my-3 show-answer" @click="showAnswer(flashcard.id)">show/hide answer</a>
+        <h5 class="answer mb-3" v-show="flashcard.isShowAnswerVisible" >{{ flashcard.answer}}</h5>
+        <div  class="flashcard-btn d-flex justify-content-between">
+         <a  id="edit-flashcard" class=" btn my-1 edit-flashcard text-uppercase"
+          @click="editCard(flashcard.id)">edit</a>
+         <a  id="delete-flashcard" class=" btn my-1 delete-flashcard text-uppercase" @click="deleteCard(flashcard.id)">delete</a>
+        </div>
+      </div>
+      <!--edit mode-->
+      <div  class="card card-body my-3 question-card" v-else="flashcard.editMode">
+        <div  class="alert alert-warning" role="alert" v-show="areFieldsEmpty"> 
+           Some of the fields are empty!
+         </div>
+        <a  href="#" class="close-btn mt-0">
+         <i class="fas fa-window-close" @click="closeCardEditMode(flashcard.id)"></i>
+        </a>
+        <div class="feedback alert w-75 text-capitalize">
+         customer feedback
+        </div>
+        <form @submit.prevent="saveEditedCard(flashcard.id)" id="question-form">
+         <h5 class="text-capitalize">question</h5>
+         <div class="form-group">
+          <textarea class="w-100" id="question-input" rows="3" v-model="flashcard.question"></textarea>
+         </div>
+         <h5 class="text-capitalize">answer</h5>
+         <div class="form-group">
+          <textarea class="w-100" id="answer-input" rows="3" v-model="flashcard.answer"></textarea></textarea>
+         </div>
+         <button class="btn submitBtn text-capitalize w-50" >save</button>
+        </form>
+       </div>
+      </div>
      </div>
     </div>
    </div>
-
   </div>
  </div>
 
